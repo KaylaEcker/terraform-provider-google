@@ -461,6 +461,18 @@ func resourceContainerCluster() *schema.Resource {
 				ForceNew:     true,
 				ValidateFunc: validation.CIDRNetwork(28, 28),
 			},
+
+			"labels": &schema.Schema{
+				Type:     schema.TypeMap,
+				Optional: true,
+				Elem:     &schema.Schema{Type: schema.TypeString},
+				Set:      schema.HashString,
+			},
+
+			"label_fingerprint": &schema.Schema{
+				Type:     schema.TypeString,
+				Computed: true,
+			},
 		},
 	}
 }
