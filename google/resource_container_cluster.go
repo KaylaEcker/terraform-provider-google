@@ -799,6 +799,8 @@ func resourceContainerClusterRead(d *schema.ResourceData, meta interface{}) erro
 
 	d.Set("private_cluster", cluster.PrivateCluster)
 	d.Set("master_ipv4_cidr_block", cluster.MasterIpv4CidrBlock)
+	d.Set("labels", cluster.Labels)
+	d.Set("label_fingerprint", cluster.LabelFingerprint)
 
 	return nil
 }
