@@ -602,6 +602,10 @@ func resourceContainerClusterCreate(d *schema.ResourceData, meta interface{}) er
 		cluster.EnableKubernetesAlpha = v.(bool)
 	}
 
+	if _, ok := d.GetOk("labels"); ok {
+		cluster.Labels = expandLabels(d)
+	}
+
 	nodePoolsCount := d.Get("node_pool.#").(int)
 	if nodePoolsCount > 0 {
 		nodePools := make([]*containerBeta.NodePool, 0, nodePoolsCount)
