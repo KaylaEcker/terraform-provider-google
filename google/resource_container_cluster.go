@@ -1169,6 +1169,35 @@ func resourceContainerClusterUpdate(d *schema.ResourceData, meta interface{}) er
 		}
 	}
 
+	if d.HasChange("labels") {
+		labels := expandLabels(d)
+		labelFingerprint := d.Get("label_fingerprint").(string)
+		setLabelsRequest := compute.GlobalSetLabelsRequest{
+			LabelFingerprint: labelFingerprint,
+			Labels:           labels,
+			ForceSendFields:  []string{"Labels"},
+		}
+
+		op, err := config.clientContainerBeta.Cluster.SetLabels(project, d.Id(), &setLabelsRequest).Do()
+		if err != nil {
+			return err
+		}
+
+		d.SetPartial("labels")
+
+		err = containerOperationWaitTime(config.clientContainerBeta, op, project, "Setting labels", int(d.Timeout(schema.TimeoutUpdate).Minutes()))
+		if err != nil {
+			return err
+		}
+		// Perform a read to see the new label_fingerprint value
+		cluster, err := config.clientContainerBeta.Cluster.Get(project, d.Id()).Do()
+		if err != nil {
+			return err
+		}
+		d.Set("label_fingerprint", cluster.LabelFingerprint)
+		d.SetPartial("label_fingerprint")
+	}
+
 	d.Partial(false)
 
 	return resourceContainerClusterRead(d, meta)
